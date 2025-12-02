@@ -1,0 +1,32 @@
+# Data files
+data/
+*.csv
+*.json
+*.sqlite
+*.db
+
+# Model files
+models/
+*.pkl
+*.h5
+*.onnx
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+
+# OS specific
+.DS_Store
+Thumbs.db
