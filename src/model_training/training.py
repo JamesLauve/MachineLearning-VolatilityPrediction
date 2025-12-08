@@ -1,5 +1,7 @@
 from sklearn.model_selection import train_test_split
-
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.linear_model import LogisticRegression
+import numpy as np
 
 
 def form_prob(df):
@@ -16,6 +18,9 @@ def form_prob(df):
                 'day_of_week_sin', 'day_of_week_cos', 'month_of_year_sin', 'month_of_year_cos',
                 ]
     target_col = 'Target_Vol'
+    #We might want to predict the log volatility instead because it is positive and might be more normally distributed
+    # We will check which 
+    # target_col = 'log_vol_target'
 
     X = df[feature_col]
     y = df[target_col]
@@ -23,13 +28,15 @@ def form_prob(df):
     print("Target vector shape:", y.shape)
     return X, y
 
-def split_data(X, y, test_size=0.2):
-    split_index = int(len(X) * (1 - test_size))
-    X_train, X_test = X[:split_index], X[split_index:]
-    y_train, y_test = y[:split_index], y[split_index:]
+def rolling_split_data(X, y, test_size=0.2, splits=5, model= LogisticRegression ):
+    tss = TimeSeriesSplit(n_splits=splits, test_size=int(len(X)*test_size))
+    for fold, (train_index, test_index) in enumerate(tss.split(X)):
+        print(f"Fold {fold}")
+        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
-    print("Train size:", X_train.shape[0])
-    print("Test size :", X_test.shape[0])
+        model.fit(X_train, y_train)
 
-    return X_train, X_test, y_train, y_test
+        y_pred = model.predict(X_test)
 
+        yield X, y_test, y_pred
